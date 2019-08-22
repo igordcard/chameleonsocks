@@ -110,11 +110,12 @@ do_stop()
 {
 
 ################### CLEAR IPTABLE RULES ##########################################
-
 	iptables -t nat -F CHAMELEONSOCKS
 	iptables -t nat -D CHAMELEONSOCKS -p tcp -j REDIRECT --to-ports 1080
 	iptables -t nat -D OUTPUT -p tcp -j CHAMELEONSOCKS
+	iptables -S OUTPUT -t nat | grep CHAMELEONSOCKS | cut -d " " -f 2- | xargs -rL1 iptables -t nat -D
 	iptables -t nat -D PREROUTING -i docker0 -p tcp -j CHAMELEONSOCKS
+	iptables -S PREROUTING -t nat | grep CHAMELEONSOCKS | cut -d " " -f 2- | xargs -rL1 iptables -t nat -D
 	iptables -t nat -X CHAMELEONSOCKS
 
 ################### CLEAR IPTABLE RULES END ######################################
